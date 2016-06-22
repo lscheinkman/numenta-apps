@@ -21,10 +21,9 @@
 # ----------------------------------------------------------------------
 # Script used to build win32 version of Unicorn.
 # Arguments:
-#   1) nupic_version (i.e. "0.5.0")
-#   2) CSC_LINK. See https://github.com/electron-userland/electron-builder/wiki/Code-Signing
-#   3) CSC_KEY_PASSWORD. See https://github.com/electron-userland/electron-builder/wiki/Code-Signing
-#   4) GA_TRACKING_ID. See https://analytics.google.com/analytics
+#   1) CSC_LINK. See https://github.com/electron-userland/electron-builder/wiki/Code-Signing
+#   2) CSC_KEY_PASSWORD. See https://github.com/electron-userland/electron-builder/wiki/Code-Signing
+#   3) GA_TRACKING_ID. See https://analytics.google.com/analytics
 #>
 param (
     [string]$nupic_version = "0.5.0",
@@ -35,19 +34,10 @@ param (
 Write-Host "Configure WinRM"
 winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="2048"}'
 
-Write-Host "Configure npm"
-npm config set msvs_version 2015
-
 Write-Host "Mount shared folder to 'x:' drive"
 # Must match shared folder name in vagrant file
 # See 'config.vm.synced_folder')
 net use x: \\VBOXSVR\shared /PERSISTENT:YES
-pushd x:\
-
-Write-Host "Build python and nupic"
-pushd scripts\Windows64
-powershell.exe -ExecutionPolicy RemoteSigned .\simple_build_portable_python_with_nupic.ps1 -nupic_version=$nupic_version
-popd
 
 Write-Host "Set environment variables"
 $env:CSC_LINK = $CSC_LINK
@@ -55,6 +45,7 @@ $env:CSC_KEY_PASSWORD = $CSC_KEY_PASSWORD
 $env:GA_TRACKING_ID = $GA_TRACKING_ID
 
 Write-Host "Clean, install, build and package windows version"
+pushd x:\
 npm run clean
-npm install
 npm run build:win
+popd
