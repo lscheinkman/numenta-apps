@@ -29,6 +29,12 @@ PROJECT_ROOT = File.expand_path("..", File.dirname(__FILE__))
 package = JSON.parse(File.read("#{PROJECT_ROOT}/package.json"))
 NODE_VERSION = package["engines"]["node"]
 
+# Install 'vagrant-scp' plugin
+unless Vagrant.has_plugin?('vagrant-scp')
+  puts "Installing 'vagrant-scp'"
+  %x(vagrant plugin install vagrant-scp)
+end
+
 # Linked clones requires version 1.8
 Vagrant.require_version ">= 1.8"
 
