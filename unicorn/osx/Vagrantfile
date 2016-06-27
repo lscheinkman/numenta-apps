@@ -22,8 +22,11 @@
 # ----------------------------------------------------------------------
 require 'json'
 
+# Calculate project root dir
+PROJECT_ROOT = File.expand_path("..", File.dirname(__FILE__))
+
 # Get required 'node' version from 'package.json'
-package = JSON.parse(File.read(File.expand_path "../package.json"))
+package = JSON.parse(File.read("#{PROJECT_ROOT}/package.json"))
 NODE_VERSION = package["engines"]["node"]
 
 # Linked clones requires version 1.8
@@ -35,6 +38,11 @@ Vagrant.configure(2) do |config|
     # Use linked clones instead of importing hard-disk
     vb.linked_clone = true
   end
+
+  # Share project root directory
+  config.vm.synced_folder PROJECT_ROOT, "/shared", type: "rsync",
+    owner: "vagrant", group: "staff",
+    rsync__exclude: ".git/"
 
   # Additional provisioning for requirements not satisfied by image alone.
   # Arguments:

@@ -33,7 +33,7 @@ sudo -u vagrant -i brew tap --repair
 sudo -u vagrant -i brew update
 
 # Initialize .bashrc with PATH
-sudo -u vagrant /usr/libexec/path_helper -s >> /Users/vagrant/.bashrc
+sudo -u vagrant /usr/libexec/path_helper -s > /Users/vagrant/.bashrc
 sudo -u vagrant ln -s .bashrc .bash_profile
 
 # Install cmake with homebrew
@@ -48,3 +48,4 @@ sudo -u vagrant echo "source $(brew --prefix nvm)/nvm.sh" >> /Users/vagrant/.bas
 
 # Switch nodejs to version specified in 'Vagrant' file
 sudo -u vagrant -i nvm install v$1
+sudo -u vagrant -i nvm use $1
