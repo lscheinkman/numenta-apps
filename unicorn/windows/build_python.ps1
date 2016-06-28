@@ -24,7 +24,7 @@
 #   1) nupic_version (i.e. "0.5.0")
 #>
 param (
-    [string]$nupic_version = "0.5.0",
+    [string]$nupic_version = "0.5.0"
 )
 Write-Host "Configure WinRM"
 winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="2048"}'
