@@ -399,9 +399,6 @@ Build the electron app with:
 
 ```shell
 npm run build:osx
-
-# same thing, but explicit
-NODE_ENV=production npm run build:osx
 ```
 
 The resulting artifacts can be found in `dist/`
@@ -410,13 +407,137 @@ The resulting artifacts can be found in `dist/`
 
 ```shell
 npm run build:win
-
-# same thing, but explicit
-NODE_ENV=production npm run build:win
 ```
 
 The resulting artifacts can be found in `dist/`
 
+
+### Isolated (Vagrant)
+
+It is also possible to build both "Mac OS" and "Window" versions in isolation
+using virtual machines. We chose to use a combination of
+[Virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/)
+to manage and configure the virtual machines.
+
+Requirements:
+  - [Virtualbox 5.0.20](https://www.virtualbox.org/wiki/Downloads/) or greater
+  - [Vagrant 1.8](https://www.vagrantup.com/downloads.html) or greater
+
+#### Mac OS/X
+
+The following command will create a new OSX virtual machine with all software
+required to build and package the application.
+See [osx/Vagrantfile](osx/Vagrantfile) and [osx/vagrant-provision.sh](osx/vagrant-provision.sh)
+for details:
+
+```shell
+cd osx
+vagrant up
+```
+
+Once the VM is up and running, the application source code will be available from
+the `/shared` folder.
+
+This shared folder is using [vagrant's rsync shared folder](https://www.vagrantup.com/docs/synced-folders/rsync.html) feature which
+provides **one-way sync** from host to guest. You may use
+[vagrant rsync](https://www.vagrantup.com/docs/cli/rsync.html)
+command to force a re-sync from host to guest.
+
+##### Building the application
+
+Vagrant uses `ssh` to communicate with OSX Guest virtual machines therefore you
+can just send [ssh](https://www.vagrantup.com/docs/cli/ssh.html) commands
+directly to build all the artifacts. Make sure to `cd` to the `/shared` directory
+before invoking build commands. For example:
+
+- Build python
+```shell
+vagrant ssh -c 'cd /shared/scripts/OSX; ./build-python.sh'
+```
+
+- Build unicorn. Passing all required environment variables.
+```shell
+vagrant ssh -c 'cd /shared; GA_TRACKING_ID="..." CSC_LINK="..." CSC_KEY_PASSWORD="..." npm run build:osx'
+```
+
+##### Collecting artifacts
+
+Once the application is built you can use
+[vagrant-scp](https://rubygems.org/gems/vagrant-scp) to copy the artifacts from
+the virtual machine. For example:
+```shell
+vagrant scp :/shared/dist/* dist
+```
+
+#### Windows
+
+The following command will create a new Windows virtual machine with all
+software required to build and package the application.
+See [windows/Vagrantfile](windows/Vagrantfile) and
+[windows/vagrant-provision.ps1](windows/vagrant-provision.ps1) for details:
+
+```shell
+cd windows
+vagrant up
+```
+
+Once the VM is up and running, the application source code be available from
+the `\\VBOXSVR\shared` shared folder which should be mounted to `x:` drive.
+
+You can remount the shared folder using the following command:
+```
+net use x: \\VBOXSVR\shared /PERSISTENT:YES
+```
+
+This shared folder is using [VirtualBox shared folder](https://www.vagrantup.com/docs/synced-folders/virtualbox.html) feature
+which syncs file changes from the guest to the host and vice versa.
+
+
+##### Building the application
+
+Vagrant uses uses `winrm` to communicate with Windows virtual machines therefore
+you can just send [vagrant-winrm](https://rubygems.org/gems/vagrant-winrm)
+commands to build all the artifacts. Make sure to `cd` to the `x:` drive
+before invoking build commands. For example:
+
+```shell
+vagrant winrm -c 'pushd x:\; npm run build:win'
+```
+
+The default build scripts can be found in the `c:\vagrant` folder which is shared
+automatically by [vagrant synced-folders](https://www.vagrantup.com/docs/synced-folders/)
+feature.
+
+- Build python
+```shell
+vagrant winrm -c 'c:\vagrant\build_python.ps1'
+```
+
+- Build unicorn
+```shell
+vagrant winrm -c 'c:\vagrant\build_unicorn.ps1'
+```
+
+> **NOTE**: `vagrant-winrm` cannot handle
+> [command-line greater than 3040 chars](https://github.com/WinRb/WinRM/issues/41)
+> therefore we cannot pass all required environment variables from the command-line.
+>
+> For that reason the `build_unicorn.ps1` script has extra code to use the
+> variables defined in the file `build.properties` in addition to any other
+> environment variables passed to the command. For example:
+>
+> **build.properties**
+> ```
+> CSC_LINK=base64-encoded p12 certificate
+> CSC_KEY_PASSWORD=p12 certificate password
+> GA_TRACKING_ID=UA-XXXXXXXX-X
+> ```
+
+##### Collecting artifacts
+
+[VirtualBox shared folder](https://www.vagrantup.com/docs/synced-folders/virtualbox.html)
+keeps all files in sync, therefore the artifacts will be available in the `dist`
+as with normal build.
 
 ## Release
 
