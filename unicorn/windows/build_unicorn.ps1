@@ -19,7 +19,9 @@
 #
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
-# Script used to build windows version of Unicorn.
+# Script used to build win32 version of Unicorn in isolation using vagrant.
+# See 'Vagrantfile' and 'vagrant-provision.ps1` for details.
+#
 # Environment Variables:
 #   1) CSC_LINK. See https://github.com/electron-userland/electron-builder/wiki/Code-Signing
 #   2) CSC_KEY_PASSWORD. See https://github.com/electron-userland/electron-builder/wiki/Code-Signing
@@ -34,8 +36,9 @@ Write-Host "Configure WinRM"
 winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="2048"}'
 
 Write-Host "Mount shared folder to 'x:' drive"
-# Must match shared folder name in vagrant file
-# See 'config.vm.synced_folder')
+# Must match shared folder name in vagrant file. It should point to the project
+# root location (i.e. 'numenta-apps/unicorn')
+# See 'config.vm.synced_folder' in 'Vagrantfile'
 net use x: \\VBOXSVR\shared /PERSISTENT:YES
 
 Write-Host "Get variables from '$PSScriptRoot\build.properties'"

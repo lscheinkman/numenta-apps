@@ -19,7 +19,9 @@
 #
 # http://numenta.org/licenses/
 # ----------------------------------------------------------------------
-# Script used to build win32 version of Unicorn.
+# Script used to build win32 version of Unicorn in isolation using vagrant.
+# See 'Vagrantfile' and 'vagrant-provision.ps1` for details.
+#
 # Arguments:
 #   1) nupic_version (i.e. "0.5.0")
 #>
@@ -30,8 +32,9 @@ Write-Host "Configure WinRM"
 winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="2048"}'
 
 Write-Host "Mount shared folder to 'x:' drive"
-# Must match shared folder name in vagrant file
-# See 'config.vm.synced_folder')
+# Must match shared folder name in vagrant file. It should point to the project
+# root location (i.e. 'numenta-apps/unicorn')
+# See 'config.vm.synced_folder' in 'Vagrantfile'
 net use x: \\VBOXSVR\shared /PERSISTENT:YES
 
 Write-Host "Build python and nupic"
