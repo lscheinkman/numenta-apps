@@ -481,6 +481,13 @@ cd windows
 vagrant up
 ```
 
+After creating and provisioning the Windows VM for the first time it is
+recommended to reboot in order for OS to finish its post installation processes.
+
+```shell
+vagrant reload
+```
+
 Once the VM is up and running, the application source code be available from
 the `\\VBOXSVR\shared` shared folder which should be mounted to `x:` drive.
 
@@ -495,7 +502,7 @@ which syncs file changes from the guest to the host and vice versa.
 
 ##### Building the application
 
-Vagrant uses uses `winrm` to communicate with Windows virtual machines therefore
+Vagrant uses `winrm` to communicate with Windows virtual machines therefore
 you can just send [vagrant-winrm](https://rubygems.org/gems/vagrant-winrm)
 commands to build all the artifacts. Make sure to `cd` to the `x:` drive
 before invoking build commands. For example:
