@@ -98,6 +98,7 @@ export class ParamFinderService extends EventEmitter {
 
     const params = [
       '-E',
+      '-s',
       '-m', 'unicorn_backend.param_finder_runner',
       '--input', JSON.stringify(inputOpt)
     ];
