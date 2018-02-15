@@ -237,7 +237,7 @@ def findParameters(samples):
 
   medianSamplingIntervalInMs = _getMedianSamplingInterval(timestampsInMs)
   
-  if medianSamplingIntervalInMs > 0:
+  if medianSamplingIntervalInMs.astype(int) > 0:
     values = _resampleData(timestampsInMs,
                            values,
                            medianSamplingIntervalInMs)
