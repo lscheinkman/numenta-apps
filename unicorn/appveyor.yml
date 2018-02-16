@@ -1,0 +1,38 @@
+version: 1.0.{build}
+
+branches:
+  except:
+    - gh-pages
+
+image: Visual Studio 2015
+
+init:
+  - git config --global core.autocrlf input
+
+clone_folder: c:\projects\numenta-apps
+clone_depth: 1
+
+environment:
+  # CSC_LINK: ""
+  # CSC_KEY_PASSWORD: ""
+  GA_TRACKING_ID:
+    secure: 7f/O/HOXg7FUjZM8QQUT1w==
+
+install:
+  - ps: Install-Product node "5.10.0"
+  - npm install -g npm@3.10.10
+  - npm config set msvs_version 2015 --global
+  - npm config set build-from-source --global
+
+build_script:
+  - cd unicorn\scripts\Windows64
+  - ps: ./simple_build_portable_python_with_nupic.ps1 "0.5.0"
+  - cd ..\..
+  - npm install --loglevel=debug
+  - npm run build:win
+
+test: off
+
+artifacts:
+  - path: 'unicorn\scripts\Windows64\portable_python.tar.gz'
+  - path: 'unicorn\dist\win\*'
